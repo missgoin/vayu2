@@ -10,7 +10,7 @@ KERNEL_DIR="$(pwd)"
 
 ##----------------------------------------------------------##
 # Device Name and Model
-MODEL=POCO
+MODEL=POCO X3 PRO
 DEVICE=vayu
 
 # Kernel Version Code
@@ -24,7 +24,7 @@ DISABLE_LTO=0
 THIN_LTO=0
 
 # Files
-IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz
+IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 DTBO=$(pwd)/out/arch/arm64/boot/dtbo.img
 DTB=$(pwd)/out/arch/arm64/boot/dts/qcom
 
@@ -43,12 +43,12 @@ TANGGAL=$(date +"%F%S")
 # Specify Final Zip Name
 ZIPNAME=SUPER.KERNEL
 FINAL_ZIP=${ZIPNAME}-${DEVICE}-${TANGGAL}.zip
-FINAL_ZIP_ALIAS=Karenulvay-${TANGGAL}.zip
+FINAL_ZIP_ALIAS=Karenulvin-${TANGGAL}.zip
 
 ##----------------------------------------------------------##
 # Specify compiler.
 
-COMPILER=cosmic
+COMPILER=cosmic-clang
 
 ##----------------------------------------------------------##
 # Specify Linker
@@ -79,6 +79,11 @@ function cloneTC() {
     then
     git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 cosmic
     PATH="${KERNEL_DIR}/cosmic/bin:$PATH"
+    
+    elif [ $COMPILER = "cosmic-clang" ];
+    then
+    git clone --depth=1 https://gitlab.com/GhostMaster69-dev/cosmic-clang.git -b master cosmic-clang
+    PATH="${KERNEL_DIR}/cosmic-clang/bin:$PATH"
     
 	elif [ $COMPILER = "azure" ];
 	then
@@ -129,6 +134,9 @@ function exports() {
         elif [ -d ${KERNEL_DIR}/cosmic ];
            then
                export KBUILD_COMPILER_STRING=$(${KERNEL_DIR}/cosmic/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')        
+        elif [ -d ${KERNEL_DIR}/cosmic-clang ];
+           then
+               export KBUILD_COMPILER_STRING=$(${KERNEL_DIR}/cosmic-clang/bin/clang --version | head -n 1 | sed -e 's/  */ /g' -e 's/[[:space:]]*$//' -e 's/^.*clang/clang/')
         elif [ -d ${KERNEL_DIR}/aosp-clang ];
             then
                export KBUILD_COMPILER_STRING=$(${KERNEL_DIR}/aosp-clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
@@ -191,8 +199,8 @@ START=$(date +"%s")
 	       CC=clang \
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-	       #LLVM=1 \
-	       #LLVM_IAS=1 \
+	       LLVM=1 \
+	       LLVM_IAS=1 \
 	       LD=${LINKER} \
 	       AR=llvm-ar \
 	       NM=llvm-nm \
@@ -209,14 +217,32 @@ START=$(date +"%s")
 	       CC=clang \
            CROSS_COMPILE=aarch64-linux-gnu- \
            CROSS_COMPILE_ARM32=arm-linux-gnueabi \
-           #LLVM=1 \
-           #LLVM_IAS=1 \
-           AR=llvm-ar \
-           NM=llvm-nm \
-           LD=${LINKER} \
-           OBJCOPY=llvm-objcopy \
-           OBJDUMP=llvm-objdump \
-           STRIP=llvm-strip \
+           LLVM=1 \
+           LLVM_IAS=1 \
+           #AR=llvm-ar \
+           #NM=llvm-nm \
+           #LD=${LINKER} \
+           #OBJCOPY=llvm-objcopy \
+           #OBJDUMP=llvm-objdump \
+           #STRIP=llvm-strip \
+	       V=$VERBOSE 2>&1 | tee error.log
+	elif [ -d ${KERNEL_DIR}/cosmic-clang ];
+	   then
+	       make -kj$(nproc --all) O=out \
+	       ARCH=arm64 \
+	       CC=clang \
+	       CROSS_COMPILE=aarch64-linux-gnu- \
+	       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+	       LLVM=1 \
+	       LLVM_IAS=1 \
+	       #LD=${LINKER} \
+	       #AR=llvm-ar \
+	       #NM=llvm-nm \
+	       #OBJCOPY=llvm-objcopy \
+	       #OBJDUMP=llvm-objdump \
+	       #STRIP=llvm-strip \
+	       #READELF=llvm-readelf \
+	       #OBJSIZE=llvm-size \
 	       V=$VERBOSE 2>&1 | tee error.log
 	elif [ -d ${KERNEL_DIR}/gcc64 ];
 	   then
@@ -266,7 +292,7 @@ function zipping() {
         zip -r9 ${FINAL_ZIP_ALIAS} *
         MD5CHECK=$(md5sum "$FINAL_ZIP_ALIAS" | cut -d' ' -f1)
         echo "Zip: $FINAL_ZIP_ALIAS"
-        curl -T $FINAL_ZIP_ALIAS https://oshi.at; echo
+        curl -T $FINAL_ZIP_ALIAS temp.sh; echo
     cd ..
 }
     
@@ -276,8 +302,6 @@ cloneTC
 exports
 configs
 compile
-END=$(date +"%s")
-DIFF=$(($END - $START))
 zipping
 
 ##----------------*****-----------------------------##
