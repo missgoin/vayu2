@@ -48,7 +48,7 @@ FINAL_ZIP_ALIAS=Karenulvay-${TANGGAL}.zip
 ##----------------------------------------------------------##
 # Specify compiler.
 
-COMPILER=cosmic
+COMPILER=trb
 
 ##----------------------------------------------------------##
 # Specify Linker
@@ -189,13 +189,11 @@ START=$(date +"%s")
 	       make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
 	       CC=clang \
-	       HOSTCC=clang \
-	       HOSTCXX=clang++ \
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-	       LLVM=1 \
+	       #LLVM=1 \
 	       #LLVM_IAS=1 \
-	       #LD=${LINKER} \
+	       LD=${LINKER} \
 	       AR=llvm-ar \
 	       NM=llvm-nm \
 	       OBJCOPY=llvm-objcopy \
@@ -211,8 +209,8 @@ START=$(date +"%s")
 	       CC=clang \
            CROSS_COMPILE=aarch64-linux-gnu- \
            CROSS_COMPILE_ARM32=arm-linux-gnueabi \
-           LLVM=1 \
-           LLVM_IAS=1 \
+           #LLVM=1 \
+           #LLVM_IAS=1 \
            AR=llvm-ar \
            NM=llvm-nm \
            LD=${LINKER} \
