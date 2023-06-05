@@ -48,7 +48,7 @@ FINAL_ZIP_ALIAS=Karenulvay-${TANGGAL}.zip
 ##----------------------------------------------------------##
 # Specify compiler.
 
-COMPILER=cosmic
+COMPILER=trb
 
 ##----------------------------------------------------------##
 # Specify Linker
@@ -205,7 +205,7 @@ START=$(date +"%s")
 	       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
 	       LLVM=1 \
 	       LLVM_IAS=1 \
-	       LD=${LINKER} \
+	       #LD=${LINKER} \
 	       AR=llvm-ar \
 	       NM=llvm-nm \
 	       OBJCOPY=llvm-objcopy \
