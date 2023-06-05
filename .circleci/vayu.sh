@@ -14,17 +14,17 @@ MODEL=POCO X3 PRO
 DEVICE=vayu
 
 # Kernel Version Code
-VERSION=
+#VERSION=
 
 # Kernel Defconfig
 DEFCONFIG=${DEVICE}_defconfig
 
 # Select LTO variant ( Full LTO by default )
 DISABLE_LTO=0
-THIN_LTO=0
+THIN_LTO=1
 
 # Files
-IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
+IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz
 DTBO=$(pwd)/out/arch/arm64/boot/dtbo.img
 DTB=$(pwd)/out/arch/arm64/boot/dts/qcom
 
@@ -43,12 +43,12 @@ TANGGAL=$(date +"%F%S")
 # Specify Final Zip Name
 ZIPNAME=SUPER.KERNEL
 FINAL_ZIP=${ZIPNAME}-${DEVICE}-${TANGGAL}.zip
-FINAL_ZIP_ALIAS=Karenulvin-${TANGGAL}.zip
+FINAL_ZIP_ALIAS=Karenulvay-${TANGGAL}.zip
 
 ##----------------------------------------------------------##
 # Specify compiler.
 
-COMPILER=cosmic-clang
+COMPILER=cosmic
 
 ##----------------------------------------------------------##
 # Specify Linker
@@ -155,6 +155,10 @@ function exports() {
         
 	    export PROCS=$(nproc --all)
 	    export DISTRO=$(source /etc/os-release && echo "${NAME}")
+	    
+	    # Server caching for speed up compile
+	    export LC_ALL=C && export USE_CCACHE=1
+	    ccache -M 100G
 	
 	}
         
@@ -217,14 +221,14 @@ START=$(date +"%s")
 	       CC=clang \
            CROSS_COMPILE=aarch64-linux-gnu- \
            CROSS_COMPILE_ARM32=arm-linux-gnueabi \
-           LLVM=1 \
-           LLVM_IAS=1 \
-           #AR=llvm-ar \
-           #NM=llvm-nm \
-           #LD=${LINKER} \
-           #OBJCOPY=llvm-objcopy \
-           #OBJDUMP=llvm-objdump \
-           #STRIP=llvm-strip \
+           #LLVM=1 \
+           #LLVM_IAS=1 \
+           AR=llvm-ar \
+           NM=llvm-nm \
+           LD=${LINKER} \
+           OBJCOPY=llvm-objcopy \
+           OBJDUMP=llvm-objdump \
+           STRIP=llvm-strip \
 	       V=$VERBOSE 2>&1 | tee error.log
 	elif [ -d ${KERNEL_DIR}/cosmic-clang ];
 	   then
