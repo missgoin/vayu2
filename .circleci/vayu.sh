@@ -297,7 +297,8 @@ function zipping() {
         zip -r9 ${FINAL_ZIP_ALIAS} *
         MD5CHECK=$(md5sum "$FINAL_ZIP_ALIAS" | cut -d' ' -f1)
         echo "Zip: $FINAL_ZIP_ALIAS"
-        curl -T $FINAL_ZIP_ALIAS https://oshi.at; echo
+        #curl -T $FINAL_ZIP_ALIAS https://oshi.at; echo
+        curl --upload-file $FINAL_ZIP_ALIAS https://free.keep.sh; echo
     cd ..
 }
     
