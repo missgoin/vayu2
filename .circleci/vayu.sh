@@ -21,7 +21,7 @@ DEFCONFIG=${DEVICE}_defconfig
 
 # Select LTO variant ( Full LTO by default )
 DISABLE_LTO=0
-THIN_LTO=1
+THIN_LTO=0
 
 # Files
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz
@@ -72,7 +72,8 @@ function cloneTC() {
     
     elif [ $COMPILER = "trb" ];
     then
-    git clone --depth=1 https://gitlab.com/varunhardgamer/trb_clang.git clang
+    #git clone --depth=1 https://gitlab.com/varunhardgamer/trb_clang.git -b 17 clang
+    git clone --depth=1 https://gitlab.com/chematelegram/clang-trb.git -b 17 clang
     PATH="${KERNEL_DIR}/clang/bin:$PATH"
     
     elif [ $COMPILER = "cosmic" ];
@@ -204,7 +205,7 @@ START=$(date +"%s")
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
 	       LLVM=1 \
-	       LLVM_IAS=1 \
+	       #LLVM_IAS=1 \
 	       #LD=${LINKER} \
 	       AR=llvm-ar \
 	       NM=llvm-nm \
